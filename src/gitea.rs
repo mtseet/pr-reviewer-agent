@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 // ─── Gitea API response types ───────────────────────────────────────────────
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct GiteaPullRequest {
     pub id: i64,
     pub number: i64,
