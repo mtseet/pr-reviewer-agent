@@ -49,7 +49,7 @@ GITEA_BASE_URL=http://localhost:3000
 GITHUB_TOKEN=ghp_your-token-here   
 ```
 
-## Installationn and Build Instractions
+## Installation and Build Instractions
 
 ```
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
