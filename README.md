@@ -8,7 +8,7 @@ An AI Agent that reviews prs
 - gitea support
 - github support
 
-## Screenshot
+## Screenshots
 <div style="display: flex; gap: 10px;">
 <img src="screenshots/github1.png" alt="Alt text" width="500">
 
