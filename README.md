@@ -29,6 +29,8 @@ An AI Agent that reviews prs
 
 ## Binary
 
+Check on releases page.
+
 ## Configuration
 
 `cp .env.example .env`
