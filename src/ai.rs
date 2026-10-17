@@ -3,8 +3,6 @@ use reqwest::Client;
 use serde::Deserialize;
 use std::env;
 
-// ─── AI response types ──────────────────────────────────────────────────────
-
 #[derive(Deserialize)]
 pub struct OpenAIResponse {
     pub choices: Vec<OpenAIChoice>,
@@ -35,7 +33,47 @@ pub struct ReviewIssue {
     pub body: String,
 }
 
-// ─── AI reviewer ────────────────────────────────────────────────────────────
+/// Adds line numbers to + lines in a unified diff so the AI can reference them.
+/// Format: `  42:+code here` (line number, colon, original diff content)
+fn number_diff_lines(diff: &str) -> String {
+    let mut result = String::with_capacity(diff.len() + 256);
+    let mut new_line: i32 = 0;
+
+    for line in diff.lines() {
+        if line.starts_with("@@") {
+            // Parse the new-file starting line from hunk header: @@ -a,b +c,d @@
+            if let Some(plus_part) = line.split('+').nth(1) {
+                let start = plus_part
+                    .split(',')
+                    .next()
+                    .and_then(|s| s.trim().parse::<i32>().ok())
+                    .unwrap_or(1);
+                new_line = start;
+            }
+            result.push_str(line);
+            result.push('\n');
+        } else if line.starts_with('+') && !line.starts_with("+++") {
+            new_line += 1;
+            result.push_str(&format!("{:4}:{}", new_line, line));
+            result.push('\n');
+        } else if line.starts_with('-') && !line.starts_with("---") {
+            // Removed line — no new-file line number
+            result.push_str(line);
+            result.push('\n');
+        } else if line.starts_with('\\') {
+            // "\ No newline at end of file"
+            result.push_str(line);
+            result.push('\n');
+        } else {
+            // Context line
+            new_line += 1;
+            result.push_str(line);
+            result.push('\n');
+        }
+    }
+
+    result
+}
 
 pub async fn call_ai_reviewer(
     client: &Client,
@@ -48,6 +86,8 @@ pub async fn call_ai_reviewer(
     let openai_model = env::var("OPENAI_MODEL").unwrap_or_else(|_| "gpt-4o".into());
     let api_key = env::var("OPENAI_API_KEY").context("OPENAI_API_KEY not set")?;
 
+    let numbered_diff = number_diff_lines(diff_text);
+
     let system_prompt = r#"
 You are a senior software engineer reviewing pull requests. Analyze the diff, identify bugs, logic errors, security issues, and style violations.
 Provide specific, actionable feedback. Output strictly valid JSON matching this schema:
@@ -56,23 +96,30 @@ Provide specific, actionable feedback. Output strictly valid JSON matching this 
     "issues": [
         {
             "path": "string (file path)",
-            "line": integer (line number in the NEW file, 1-indexed),
+            "line": integer,
             "severity": "critical" | "major" | "minor",
             "body": "string"
         }
     ],
     "event": "COMMENT"
 }
-Rules:
+
+CRITICAL RULES FOR LINE NUMBERS:
+- The diff shows line numbers prefixed to each added (+) line, e.g. "  42:+let x = 5;"
+- The "line" field MUST be one of those numbered lines — a line number that is explicitly shown in the diff.
+- NEVER invent or guess line numbers. Only use numbers you can see in the diff.
+- If an issue spans multiple lines, pick the first numbered line where the problem starts.
+- If you cannot identify a specific numbered line, do NOT include that issue.
+
+Other rules:
 - Be concise. Only report real issues.
 - If no issues, set issues to [] and event to "COMMENT".
-- Line numbers must reference the new file (the + side of the diff).
 - Do NOT include markdown code fences around your JSON output.
 "#;
 
     let user_prompt = format!(
-        "PR Title: {}\nBase Branch: {}\n\nDiff:\n{}",
-        pr_title, base_branch, diff_text
+        "PR Title: {}\nBase Branch: {}\n\nNumbered Diff (line numbers shown for + lines):\n{}",
+        pr_title, base_branch, numbered_diff
     );
 
     let response = client
@@ -105,7 +152,6 @@ Rules:
         .content
         .clone();
 
-    // Strip markdown code fences if the model added them despite instructions
     let content = content.trim();
     let content = content
         .strip_prefix("```json")

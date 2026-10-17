@@ -17,6 +17,7 @@ pub struct GithubPullRequest {
 #[allow(dead_code)]
 pub struct GithubBranch {
     pub label: String,
+    #[serde(rename = "ref")]
     pub ref_name: String,
 }
 
@@ -77,6 +78,7 @@ impl GithubClient {
             .get(&url)
             .bearer_auth(&self.token)
             .header("Accept", "application/vnd.github.v3+json")
+            .header("User-Agent", "pr-reviwer-agent/1.0")
             .send()
             .await?
             .error_for_status()
@@ -92,6 +94,7 @@ impl GithubClient {
             .get(&url)
             .bearer_auth(&self.token)
             .header("Accept", "application/vnd.github.v3+json")
+            .header("User-Agent", "pr-reviwer-agent/1.0")
             .send()
             .await?
             .error_for_status()
@@ -107,6 +110,7 @@ impl GithubClient {
             .get(&url)
             .bearer_auth(&self.token)
             .header("Accept", "application/vnd.github.v3.diff")
+            .header("User-Agent", "pr-reviwer-agent/1.0")
             .send()
             .await?
             .error_for_status()
@@ -152,6 +156,7 @@ impl GithubClient {
             .post(&url)
             .bearer_auth(&self.token)
             .header("Accept", "application/vnd.github.v3+json")
+            .header("User-Agent", "pr-reviwer-agent/1.0")
             .json(&github_review)
             .send()
             .await?;

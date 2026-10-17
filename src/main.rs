@@ -72,18 +72,9 @@ async fn run_gitea(args: &Args) -> Result<()> {
     tracing::info!("Fetching changed files...");
     let files = gitea.fetch_pr_files(args.prid).await?;
     tracing::info!("{} files changed:", files.len());
-    for f in &files {
-        tracing::info!("  {} (+{}/-{})", f.filename, f.additions, f.deletions);
-    }
 
     tracing::info!("Fetching PR diff...");
     let diff_text = gitea.fetch_pr_diff(args.prid).await?;
-    let diff_text = if diff_text.len() > 5000 {
-        tracing::warn!("Diff truncated from {} to 5000 chars", diff_text.len());
-        diff_text.chars().take(5000).collect::<String>()
-    } else {
-        diff_text
-    };
     tracing::info!("Diff length: {} chars", diff_text.len());
 
     tracing::info!("Calling AI reviewer...");
@@ -128,18 +119,9 @@ async fn run_github(args: &Args) -> Result<()> {
     tracing::info!("Fetching changed files...");
     let files = github.fetch_pr_files(args.prid).await?;
     tracing::info!("{} files changed:", files.len());
-    for f in &files {
-        tracing::info!("  {} (+{}/-{})", f.filename, f.additions, f.deletions);
-    }
 
     tracing::info!("Fetching PR diff...");
     let diff_text = github.fetch_pr_diff(args.prid).await?;
-    let diff_text = if diff_text.len() > 5000 {
-        tracing::warn!("Diff truncated from {} to 5000 chars", diff_text.len());
-        diff_text.chars().take(5000).collect::<String>()
-    } else {
-        diff_text
-    };
     tracing::info!("Diff length: {} chars", diff_text.len());
 
     tracing::info!("Calling AI reviewer...");
