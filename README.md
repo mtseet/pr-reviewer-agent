@@ -10,24 +10,42 @@ An AI Agent that reviews prs
 
 ## Screenshot
 <div style="display: flex; gap: 10px;">
-<img src="screenshots/Screenshot_1.png" alt="Alt text" width="250">
+<img src="screenshots/github1.png" alt="Alt text" width="500">
 
-<img src="screenshots/Screenshot_2.png" alt="Alt text" width="250">
+<img src="screenshots/github2.png" alt="Alt text" width="500">
 </div>
 
 <div style="display: flex; gap: 10px;">
-<img src="screenshots/Screenshot_3.png" alt="Alt text" width="250">
+<img src="screenshots/github3.png" alt="Alt text" width="500">
 
-<img src="screenshots/Screenshot_4.png" alt="Alt text" width="250">
+<img src="screenshots/github4.png" alt="Alt text" width="500">
 </div>
 
 <div style="display: flex; gap: 10px;">
-<img src="screenshots/Screenshot_5.png" alt="Alt text" width="250" height="500">
+<img src="screenshots/github5.png" alt="Alt text" width="500">
 
-<img src="screenshots/Screenshot_6.png" alt="Alt text" width="250" height="500">
+<img src="screenshots/gitea1.png" alt="Alt text" width="500">
 </div>
 
 ## Binary
+
+## Configuration
+
+`cp .env.example .env`
+
+Then update the variables in .env
+
+```
+OPENAI_API_KEY=secret
+OPENAI_API_BASE_URL=http://localhost:8080/v1
+OPENAI_MODEL=your model
+
+GITEA_OWNER=someowner
+GITEA_TOKEN=secret_token
+GITEA_BASE_URL=http://localhost:3000
+
+GITHUB_TOKEN=ghp_your-token-here   
+```
 
 ## Installationn and Build Instractions
 
