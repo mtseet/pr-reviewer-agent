@@ -72,6 +72,9 @@ Options:
   -h, --help                 Print help
   -V, --version              Print version
 ```
+## Notice
+This software was developed with the help of AI.
+It has been tested with gitea 1.23.1 and github.
 
 ## Support
 You can buy me a coffee if you like this software
