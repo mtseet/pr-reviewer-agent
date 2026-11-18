@@ -75,8 +75,3 @@ Options:
 ## Notice
 This software was developed with the help of AI.
 It has been tested with gitea 1.23.1 and github.
-
-## Support
-You can buy me a coffee if you like this software
-
-<a href="https://www.buymeacoffee.com/mtseet" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
